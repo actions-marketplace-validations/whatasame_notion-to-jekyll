@@ -6,6 +6,7 @@ export type Pages = {
 
 export type Page = {
   id: string;
+  checkbox: boolean;
   title: string;
   categories: string[];
   tags: string[];
@@ -15,10 +16,38 @@ export type Page = {
   post_path: string | null;
 };
 
-export const PROPERTY_NAMES = {
-  TITLE: '[notion-to-jekyll] title',
-  CATEGORIES: '[notion-to-jekyll] categories',
-  TAGS: '[notion-to-jekyll] tags',
-  SYNC_TIME: '[notion-to-jekyll] sync time',
-  POST_PATH: '[notion-to-jekyll] post path'
+interface DatabaseProperty {
+  name: string;
+  type: string;
+}
+
+export interface DatabaseProperties {
+  [key: string]: DatabaseProperty;
+}
+
+export const PROPERTIES: DatabaseProperties = {
+  CHECKBOX: {
+    name: 'Ready',
+    type: 'checkbox'
+  },
+  TITLE: {
+    name: 'Title',
+    type: 'title'
+  },
+  CATEGORIES: {
+    name: 'Categories',
+    type: 'multi_select'
+  },
+  TAGS: {
+    name: 'Tags',
+    type: 'multi_select'
+  },
+  SYNC_TIME: {
+    name: 'Sync time',
+    type: 'date'
+  },
+  POST_PATH: {
+    name: 'Post path',
+    type: 'rich_text'
+  }
 };

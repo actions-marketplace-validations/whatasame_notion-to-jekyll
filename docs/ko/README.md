@@ -32,6 +32,9 @@ on:
     - cron: '0 0 * * *' # 매일 자정마다 실행
   workflow_dispatch:
 
+permissions:
+  contents: write # GitHub action이 파일을 저장하기 위해 필요
+
 jobs:
   notion-to-jekyll:
     runs-on: ubuntu-latest
@@ -40,7 +43,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Notion to Jekyll synchronization
-        uses: whatasame/notion-to-jekyll@v0.1.0-beta # latest version
+        uses: whatasame/notion-to-jekyll@v0 # 최신 버전
         with:
           notion_api_key: ${{ secrets.NOTION_API_KEY }}
           notion_database_id: ${{ secrets.NOTION_DATABASE_ID }}
@@ -52,21 +55,23 @@ jobs:
 
 Notion to Jekyll은 다음과 같은 옵션을 제공합니다.
 
-| 옵션 이름                | 필수 여부 | 기본값                                   | 설명                   |
-|----------------------|-------|---------------------------------------|----------------------|
-| `notion_api_key`     | 필수    | -                                     | Notion API 키         |
-| `notion_database_id` | 필수    | -                                     | Notion 데이터베이스 ID     |
-| `post_dir`           | 선택    | `_posts`                              | Jekyll 블로그의 포스트 디렉토리 |
-| `commit_user_name`   | 선택    | `{username}`                          | Git 사용자 이름           |
-| `commit_email`       | 선택    | `{username}@users.noreply.github.com` | Git 사용자 이메일          |
-| `commit_author`      | 선택    | `{username}`                          | 커밋 작성자               |
-| `commit_message`     | 선택    | `Synchronized by Notion to Jekyll`    | 커밋 메시지               |
+| 옵션 이름                | 필수 여부 | 기본값                                   | 설명                             |
+|----------------------|-------|---------------------------------------|--------------------------------|
+| `notion_api_key`     | 필수    | -                                     | Notion API 키                   |
+| `notion_database_id` | 필수    | -                                     | Notion 데이터베이스 ID               |
+| `post_dir`           | Optional | `_posts`                             | 글이 저장될 디렉토리                    |
+| `post_layout`        | Optional | `post`                               | Jekyll front matter의 `layout` 값 |
+| `post_layout_skip`   | Optional | `false`                              | `layout`을 생성하지 않을 지 결정         |
+| `commit_user_name`   | 선택    | `{username}`                          | Git 사용자 이름                     |
+| `commit_email`       | 선택    | `{username}@users.noreply.github.com` | Git 사용자 이메일                    |
+| `commit_author`      | 선택    | `{username}`                          | 커밋 작성자                         |
+| `commit_message`     | 선택    | `Synchronized by Notion to Jekyll`    | 커밋 메시지                         |
 
 예를 들어, `post_dir` 옵션을 변경하고 싶다면 다음과 같이 작성하면 됩니다.
 
 ```yaml
 - name: Notion to Jekyll synchronization
-  uses: whatasame/notion-to-jekyll@v0.1.0-beta
+  uses: whatasame/notion-to-jekyll@v0
   with:
     notion_api_key: ${{ secrets.NOTION_API_KEY }}
     notion_database_id: ${{ secrets.NOTION_DATABASE_ID }}
@@ -80,11 +85,18 @@ Notion to Jekyll은 다음과 같은 옵션을 제공합니다.
 동기화 과정에서 다음과 같은 에러가 발생할 수 있습니다.
 
 ```
-Permission to {username}/{repository} denied to github-actions[bot]
+error: remote: Permission to {username}/{repository}.git denied to github-actions[bot].
+
+fatal: unable to access 'https://github.com/{username}/{repository}.git/': The requested URL returned error: 403
 ```
 
-이는 GitHub action이 레포지토리에 쓰기 권한이 없어서 발생하는 문제입니다. 이를 해결하기 위해서는 [GitHub 레포지토리 설정](./github-setting)에서 GitHub workflow 권한
-설정을 참고하세요.
+이는 GitHub action이 레포지토리에 쓰기 권한이 없어서 발생하는 문제입니다. 이를 해결하기 위해서는 `notion-to-jekyll.yml` 파일에 GitHub workflow 권한이 설정되어있는지
+확인해주세요.
+
+```yaml
+permissions:
+  contents: write
+```
 
 ## 기여
 

@@ -38,6 +38,9 @@ on:
     - cron: '0 0 * * *' # Run every midnight
   workflow_dispatch:
 
+permissions:
+  contents: write # Required for GitHub action to save files
+
 jobs:
   notion-to-jekyll:
     runs-on: ubuntu-latest
@@ -46,7 +49,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Notion to Jekyll synchronization
-        uses: whatasame/notion-to-jekyll@v0.1.0-beta # latest version
+        uses: whatasame/notion-to-jekyll@v0 # latest version
         with:
           notion_api_key: ${{ secrets.NOTION_API_KEY }}
           notion_database_id: ${{ secrets.NOTION_DATABASE_ID }}
@@ -59,21 +62,23 @@ run GitHub action manually.
 
 Notion to Jekyll provides the following options.
 
-| Option name          | Required | Default value                        | Description                |
-|----------------------|----------|--------------------------------------|----------------------------|
-| `notion_api_key`     | Required | -                                    | Notion API key             |
-| `notion_database_id` | Required | -                                    | Notion database ID         |
-| `post_dir`           | Optional | `_posts`                             | Jekyll blog post directory |
-| `commit_user_name`   | Optional | `{username}`                         | Git user name              |
-| `commit_email`       | Optional | `{username@users.noreply.github.com` | Git user email             |
-| `commit_author`      | Optional | `{username}`                         | Commit author              |
-| `commit_message`     | Optional | `Synchronized by Notion to Jekyll`   | Commit message             |
+| Option name          | Required | Default value                        | Description                               |
+|----------------------|----------|--------------------------------------|-------------------------------------------|
+| `notion_api_key`     | Required | -                                    | Notion API key                            |
+| `notion_database_id` | Required | -                                    | Notion database ID                        |
+| `post_dir`           | Optional | `_posts`                             | Target post directory                     |
+| `post_layout`        | Optional | `post`                               | Layout value of Jekyll front matter       |
+| `post_layout_skip`   | Optional | `false`                              | Whether to skip generating layout variable |
+| `commit_user_name`   | Optional | `{username}`                         | Git user name                             |
+| `commit_email`       | Optional | `{username@users.noreply.github.com` | Git user email                            |
+| `commit_author`      | Optional | `{username}`                         | Commit author                             |
+| `commit_message`     | Optional | `Synchronized by Notion to Jekyll`   | Commit message                            |
 
 For example, if you want to change the `post_dir` option, you can write as follows.
 
 ```yaml
 - name: Notion to Jekyll synchronization
-  uses: whatasame/notion-to-jekyll@v0.1.0-beta
+  uses: whatasame/notion-to-jekyll@v0
   with:
     notion_api_key: ${{ secrets.NOTION_API_KEY }}
     notion_database_id: ${{ secrets.NOTION_DATABASE_ID }}
@@ -87,11 +92,18 @@ For example, if you want to change the `post_dir` option, you can write as follo
 You may get the following error during the synchronization process.
 
 ```
-Permission to {username}/{repository} denied to github-actions[bot]
+error: remote: Permission to {username}/{repository}.git denied to github-actions[bot].
+
+fatal: unable to access 'https://github.com/{username}/{repository}.git/': The requested URL returned error: 403
 ```
 
 This problem occurs because GitHub action does not have write permission to the repository. To solve this problem,
-please refer to [Set up GitHub repository](./docs/en/github-setting.md) for GitHub workflow permission setting.
+please ensure that you have set up the GitHub workflow permission in `notion-to-jekyll.yml` file.
+
+```yaml
+permissions:
+  contents: write
+```
 
 ## Contributing
 
